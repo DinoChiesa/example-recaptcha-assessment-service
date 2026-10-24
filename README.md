@@ -42,10 +42,22 @@ Assessments beyond the monthly free tier are billed; see
 [reCAPTCHA pricing](https://cloud.google.com/recaptcha/pricing). CORS does not
 prevent this, because it only constrains browsers.
 
-The deploy script caps the service at 2 instances. That limits throughput, not
-cost. For anything beyond a demo, put the service behind something that
-authenticates or rate-limits callers, such as an API gateway, or delete the
-service when you are done (see [Cleanup](#cleanup)).
+What bounds the cost is a quota. Step 2b sets the project's
+`CreateAssessmentRequestsPerDayPerProject` quota to `ASSESSMENT_DAILY_CAP`
+(default 300). By default that quota is unlimited. With the cap in place, the
+project creates at most that many assessments per day, no matter how often
+the endpoint is called; beyond it, the API returns HTTP 429
+`RESOURCE_EXHAUSTED` until the next day, and the service passes that error
+back to the caller. Your own testing counts against the same cap.
+
+At 300 per day, the monthly total stays under 10,000. Check the current
+[pricing](https://cloud.google.com/recaptcha/pricing) to see what that means
+for your account; the free allowance is shared across your organization.
+
+The deploy script also limits the service to 2 instances. That limits
+throughput, not cost. For anything beyond a demo, put the service behind
+something that authenticates or rate-limits callers, such as an API gateway,
+or delete the service when you are done (see [Cleanup](#cleanup)).
 
 ## Prerequisites
 
@@ -60,6 +72,8 @@ service when you are done (see [Cleanup](#cleanup)).
 Edit `env.sh` once:
 
 - Set `CLOUDRUN_PROJECT_ID` to your project.
+- `ASSESSMENT_DAILY_CAP` is the most assessments the project may create per
+  day; see [Cost and exposure](#cost-and-exposure).
 - `RECAPTCHA_KEY_DOMAINS` lists the domains allowed to generate tokens with
   your key. `ALLOWED_ORIGINS` lists the origins allowed to call the service
   from a browser. The defaults allow the demo page at `dinochiesa.github.io`
@@ -77,11 +91,16 @@ Then run the scripts in order:
 ./0-set-project-and-enable-apis.sh
 ./1-enable-cloud-build-roles.sh
 ./2-create-runtime-service-account.sh
+./2b-cap-assessment-quota.sh
 ./3-create-recaptcha-key.sh
 # paste the "export RECAPTCHA_SITE_KEY=..." line that step 3 prints
 ./4-deploy-assessment-service.sh
 ./5-check-service.sh
 ```
+
+Step 2b caps assessments per day; see
+[Cost and exposure](#cost-and-exposure). It uses `gcloud beta`, so gcloud may
+offer to install the beta component the first time.
 
 Step 3 first looks for a key named `RECAPTCHA_KEY_DISPLAY_NAME`, and creates
 one only if none exists, so re-running it is safe. The key is a **Web,
@@ -124,7 +143,7 @@ The service reads these environment variables:
 
 ## Running locally
 
-To test without deploying to Cloud Run, run steps 0 and 3, paste the
+To test without deploying to Cloud Run, run steps 0, 2b, and 3, paste the
 `export` command, and then:
 
 ```sh
@@ -152,7 +171,8 @@ enough, or `roles/recaptchaenterprise.agent`.
 ```
 
 This deletes the service and the service account. It leaves the reCAPTCHA key
-in place, and prints the command to delete it.
+and the daily assessment cap in place, and prints the command to delete the
+key.
 
 ## License
 

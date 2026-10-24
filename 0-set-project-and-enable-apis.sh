@@ -32,11 +32,13 @@ gcloud services enable \
   cloudbuild.googleapis.com \
   artifactregistry.googleapis.com \
   recaptchaenterprise.googleapis.com \
+  cloudquotas.googleapis.com \
   --project "$CLOUDRUN_PROJECT_ID"
 
 if [[ "$RECAPTCHA_PROJECT_ID" != "$CLOUDRUN_PROJECT_ID" ]]; then
-  printf "\nEnabling reCAPTCHA API in %s...\n" "$RECAPTCHA_PROJECT_ID"
-  gcloud services enable recaptchaenterprise.googleapis.com --project "$RECAPTCHA_PROJECT_ID"
+  printf "\nEnabling reCAPTCHA and Cloud Quotas APIs in %s...\n" "$RECAPTCHA_PROJECT_ID"
+  gcloud services enable recaptchaenterprise.googleapis.com cloudquotas.googleapis.com \
+    --project "$RECAPTCHA_PROJECT_ID"
 fi
 
 printf "\nOk.\n"

@@ -29,6 +29,10 @@ export ALLOWED_ORIGINS=https://dinochiesa.github.io,http://localhost:8080
 export EXPECTED_ACTION=homepage
 export LOCAL_PORT=5150
 
+# Maximum reCAPTCHA assessments per day, set by 2b-cap-assessment-quota.sh.
+# The endpoint is unauthenticated; this cap is what bounds the cost.
+export ASSESSMENT_DAILY_CAP=300
+
 # It's probably best to just keep these unchanged.
 export CLOUDRUN_SERVICE_NAME=recaptcha-assessment
 export RUNTIME_SHORT_SA=recaptcha-assessor
