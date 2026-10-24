@@ -1,0 +1,28 @@
+{
+  "name": "recaptcha-assessment",
+  "description": "Creates reCAPTCHA assessments for tokens posted from a browser.",
+  "type": "module",
+  "version": "1.0.0",
+  "main": "server.js",
+  "scripts": {
+    "start": "node ./server.js"
+  },
+  "author": {
+    "name": "Dino Chiesa",
+    "email": "dchiesa@google.com"
+  },
+  "license": "Apache-2.0",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DinoChiesa/example-recaptcha-assessment-service.git"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "dependencies": {
+    "cors": "^2.8.6",
+    "express": "^5.3.0",
+    "google-auth-library": "^11.3.1"
+  },
+  "packageManager": "pnpm@12.15.0"
+}
